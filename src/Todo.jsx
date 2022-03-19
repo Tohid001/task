@@ -34,4 +34,4 @@ function Todo({ todo, deleteHandler }) {
   );
 }
 
-export default Todo;
+export default React.memo(Todo);
