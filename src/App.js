@@ -1,67 +1,25 @@
-import React from "react";
-import logo from "./logo.svg";
-import NavLink from "./NavLink.js";
-import Home from "./Home.js";
-import { Counter } from "./features/counter/Counter";
-import "./App.css";
-import { Routes, Route, Link } from "react-router-dom";
-
+// import { useState } from "react";
+import React, { useState } from "react";
+import Form from "./Form.jsx";
+import Todo from "./Todo.jsx";
 function App() {
-  return (
-    // <div className="App">
-    //   <header className="App-header">
-    //     <img src={logo} className="App-logo" alt="logo" />
-    //     <Counter />
-    //     <p>
-    //       Edit <code>src/App.js</code> and save to reload.
-    //     </p>
-    //     <span>
-    //       <span>Learn </span>
-    //       <a
-    //         className="App-link"
-    //         href="https://reactjs.org/"
-    //         target="_blank"
-    //         rel="noopener noreferrer"
-    //       >
-    //         React
-    //       </a>
-    //       <span>, </span>
-    //       <a
-    //         className="App-link"
-    //         href="https://redux.js.org/"
-    //         target="_blank"
-    //         rel="noopener noreferrer"
-    //       >
-    //         Redux
-    //       </a>
-    //       <span>, </span>
-    //       <a
-    //         className="App-link"
-    //         href="https://redux-toolkit.js.org/"
-    //         target="_blank"
-    //         rel="noopener noreferrer"
-    //       >
-    //         Redux Toolkit
-    //       </a>
-    //       ,<span> and </span>
-    //       <a
-    //         className="App-link"
-    //         href="https://react-redux.js.org/"
-    //         target="_blank"
-    //         rel="noopener noreferrer"
-    //       >
-    //         React Redux
-    //       </a>
-    //     </span>
-    //   </header>
-    // </div>
+  const [todos, setTodos] = useState([]);
+  const deleteHandler = (id) => {
+    const filteredTodos = todos.filter((todo, index) => todo.id !== id);
+    setTodos(filteredTodos);
+  };
 
+  const addTodoHandler = (newTodo) => {
+    setTodos([...todos, newTodo]);
+  };
+  return (
     <>
-      <NavLink></NavLink>
-      <Routes>
-        <Route path="home" element={<Home />} />
-        <Route path="counter" element={<Counter />} />
-      </Routes>
+      <Form addTodoHandler={addTodoHandler} />
+      <div className="TodoContainer">
+        {todos.map((todo, index) => {
+          return <Todo todo={todo} key={index} deleteHandler={deleteHandler} />;
+        })}
+      </div>
     </>
   );
 }
