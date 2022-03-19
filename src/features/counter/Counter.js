@@ -1,67 +1,85 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import {
-  decrement,
-  increment,
-  incrementByAmount,
-  incrementAsync,
-  incrementIfOdd,
-  selectCount,
-} from './counterSlice';
-import styles from './Counter.module.css';
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { trialThunk, selectors, deleteThunk } from "./counterSlice";
+import styles from "./Counter.module.css";
+import SuperHero from "../../SuperHero.js";
 
 export function Counter() {
-  const count = useSelector(selectCount);
+  const [s, ss] = useState(true);
   const dispatch = useDispatch();
-  const [incrementAmount, setIncrementAmount] = useState('2');
+  const allSuperHeroes = useSelector(selectors.selectAll);
+  // const [abortPromise, setAbort] = useState(null);
+  console.log("parent rendered");
 
-  const incrementValue = Number(incrementAmount) || 0;
+  useEffect(() => {
+    console.log("useef");
+    dispatch(trialThunk())
+      .unwrap()
+      .then((originalPromiseResult) => {
+        // console.log("ParentSuccess", originalPromiseResult);
+      })
+      .catch((rejectedValueOrSerializedError) => {
+        // console.log("finalError", rejectedValueOrSerializedError);
+      });
+    // return () => {
+    //   abortPromise && abortPromise.abort();
+    // };
+  }, []);
+
+  const deleteHandler = useCallback((i) => {
+    dispatch(deleteThunk(i))
+      .unwrap()
+      .then((originalPromiseResult) => {
+        console.log("finalSuccess", originalPromiseResult);
+        // alert("wait....");
+      })
+      .catch((rejectedValueOrSerializedError) => {
+        console.log("finalError", rejectedValueOrSerializedError);
+      });
+  }, []);
 
   return (
-    <div>
-      <div className={styles.row}>
-        <button
-          className={styles.button}
-          aria-label="Decrement value"
-          onClick={() => dispatch(decrement())}
-        >
-          -
-        </button>
-        <span className={styles.value}>{count}</span>
-        <button
-          className={styles.button}
-          aria-label="Increment value"
-          onClick={() => dispatch(increment())}
-        >
-          +
-        </button>
+    // <button
+    //   className={styles.button}
+    //   onClick={() => {
+    //     // const abort = dispatch(trialThunk())
+    //     //   .unwrap()
+    //     //   .then((originalPromiseResult) => {})
+    //     //   .catch((rejectedValueOrSerializedError) => {
+    //     //     console.log("unwrap", rejectedValueOrSerializedError);
+    //     //   });
+    //     // setAbort(abort);
+    //     // dispatch(trialThunk())
+    //     //   .unwrap()
+    //     //   .then((originalPromiseResult) => {
+    //     //     console.log("finalSuccess", originalPromiseResult);
+    //     //   })
+    //     //   .catch((rejectedValueOrSerializedError) => {
+    //     //     console.log("finalError", rejectedValueOrSerializedError);
+    //     //   });
+    //     // setAbort(abort);
+    //   }}
+    // >
+    //   Add Amount
+    // </button>
+
+    <>
+      <button
+        onClick={() => {
+          ss(!s);
+        }}
+      >
+        Click
+      </button>
+      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+        {allSuperHeroes.map((superhero, index) => (
+          <SuperHero
+            key={index}
+            superHero={superhero}
+            onDelete={deleteHandler}
+          />
+        ))}
       </div>
-      <div className={styles.row}>
-        <input
-          className={styles.textbox}
-          aria-label="Set increment amount"
-          value={incrementAmount}
-          onChange={(e) => setIncrementAmount(e.target.value)}
-        />
-        <button
-          className={styles.button}
-          onClick={() => dispatch(incrementByAmount(incrementValue))}
-        >
-          Add Amount
-        </button>
-        <button
-          className={styles.asyncButton}
-          onClick={() => dispatch(incrementAsync(incrementValue))}
-        >
-          Add Async
-        </button>
-        <button
-          className={styles.button}
-          onClick={() => dispatch(incrementIfOdd(incrementValue))}
-        >
-          Add If Odd
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
